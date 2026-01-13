@@ -4,7 +4,7 @@
     "description": "A simple Battleship game to practice Test Driven Development (TDD)",
     "main": "index.js",
     "scripts": {
-        "test": "jest",
+        "test": "jest --watch --verbose",
         "build": "webpack --config webpack.prod.js",
         "dev": "webpack serve --config webpack.dev.js",
         "deploy": "git checkout gh-pages && git merge main --no-edit && npm run build && git add dist -f && git commit -m 'Deployment commit' || echo 'No changes to commit' && git subtree push --prefix dist origin gh-pages && git checkout main"
