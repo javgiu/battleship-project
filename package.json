@@ -1,0 +1,38 @@
+{
+    "name": "battleship-project",
+    "version": "1.0.0",
+    "description": "A simple Battleship game to practice Test Driven Development (TDD)",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest",
+        "build": "webpack --config webpack.prod.js",
+        "dev": "webpack serve --config webpack.dev.js",
+        "deploy": "git checkout gh-pages && git merge main --no-edit && npm run build && git add dist -f && git commit -m 'Deployment commit' || echo 'No changes to commit' && git subtree push --prefix dist origin gh-pages && git checkout main"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/javgiu/battleship-project.git"
+    },
+    "keywords": [],
+    "author": "javgiu <javygiuli@gmail.com> (https://github.com/javgiu)",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/javgiu/battleship-project/issues"
+    },
+    "homepage": "https://github.com/javgiu/battleship-project#readme",
+    "devDependencies": {
+        "@babel/core": "^7.28.6",
+        "@babel/preset-env": "^7.28.6",
+        "babel-jest": "^30.2.0",
+        "css-loader": "^7.1.2",
+        "html-loader": "^5.1.0",
+        "html-webpack-plugin": "^5.6.5",
+        "jest": "^30.2.0",
+        "raw-loader": "^4.0.2",
+        "style-loader": "^4.0.0",
+        "webpack": "^5.104.1",
+        "webpack-cli": "^6.0.1",
+        "webpack-dev-server": "^5.2.3",
+        "webpack-merge": "^6.0.1"
+    }
+}
