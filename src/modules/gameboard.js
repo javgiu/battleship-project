@@ -23,6 +23,7 @@ export function createGameboard(size) {
     const ships = [ship1, ship2, ship3];
 
     const shots = new Set();
+    const missedShots = [];
 
     // or just missed shots?
 
@@ -57,7 +58,10 @@ export function createGameboard(size) {
 
         shots.add(coordinatesToKeys(coordinates));
 
-        if (!ships.includes(board[x][y])) return null;
+        if (!ships.includes(board[x][y])) {
+            missedShots.push(coordinates);
+            return null;
+        }
 
         const ship = board[x][y];
         ship.hit();
@@ -65,5 +69,14 @@ export function createGameboard(size) {
         return board[x][y];
     }
 
-    return { board, ships, placeShip, receiveAttack };
+    function allShipsSunk() {
+        let sunkenShips = 0;
+        ships.forEach((ship) => {
+            if (ship.isSunk()) sunkenShips++;
+        });
+        if (sunkenShips === ships.length) return true;
+        else return false;
+    }
+
+    return { board, ships, placeShip, receiveAttack, allShipsSunk };
 }

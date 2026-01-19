@@ -111,4 +111,16 @@ describe("gameboard object", () => {
         expect(gameboard.ships[0].getHits()).toBe(3);
         expect(ship.isSunk()).toBe(true);
     });
+
+    test("allShipsSunk returns true if all ships are sunk", () => {
+        gameboard.ships.forEach((ship) => {
+            while (!ship.isSunk()) {
+                ship.hit();
+            }
+        });
+        expect(gameboard.ships[0].isSunk()).toBe(true);
+        expect(gameboard.ships[1].isSunk()).toBe(true);
+        expect(gameboard.ships[2].isSunk()).toBe(true);
+        expect(gameboard.allShipsSunk()).toBe(true);
+    });
 });
