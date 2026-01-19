@@ -6,6 +6,8 @@ export function createShip(length) {
         hits++;
     };
 
+    const getHits = () => hits;
+
     const isSunk = () => {
         if (hits === length) sunk = true;
         return sunk;
@@ -15,5 +17,6 @@ export function createShip(length) {
         length,
         hit,
         isSunk,
+        getHits,
     };
 }
