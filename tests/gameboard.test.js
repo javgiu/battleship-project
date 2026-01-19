@@ -2,7 +2,7 @@ import { createGameboard } from "../src/modules/gameboard";
 
 let gameboard;
 
-beforeAll(() => {
+beforeEach(() => {
     gameboard = createGameboard(8);
 });
 
@@ -74,5 +74,41 @@ describe("gameboard object", () => {
         expect(() =>
             gameboard.placeShip(gameboard.ships[0], position)
         ).toThrow();
+    });
+
+    test("receiveAttack function returns a ship1 in the coordinates", () => {
+        gameboard.placeShip(gameboard.ships[0], {
+            coordinates: [0, 0],
+            disposition: "horizontal",
+        });
+        expect(gameboard.receiveAttack([0, 0])).toEqual(gameboard.ships[0]);
+    });
+
+    test("receiveAttack function returns a ship2 in the coordinates", () => {
+        gameboard.placeShip(gameboard.ships[1], {
+            coordinates: [2, 0],
+            disposition: "horizontal",
+        });
+        expect(gameboard.receiveAttack([2, 0])).toEqual(gameboard.ships[1]);
+    });
+    test("receiveAttack function returns an error if receive the same coordinates twice", () => {
+        expect(gameboard.receiveAttack([2, 0])).toBe(null);
+        expect(() => gameboard.receiveAttack([2, 0])).toThrow();
+    });
+
+    test("recieveAttack can hit the ship in all the places and make it sunk", () => {
+        gameboard.placeShip(gameboard.ships[0], {
+            coordinates: [0, 0],
+            disposition: "horizontal",
+        });
+        const ship = gameboard.receiveAttack([0, 0]);
+        expect(() => gameboard.receiveAttack([0, 0])).toThrow();
+        expect(ship.getHits()).toBe(1);
+        expect(gameboard.ships[0].getHits()).toBe(1);
+        gameboard.receiveAttack([0, 1]);
+        expect(gameboard.ships[0].getHits()).toBe(2);
+        gameboard.receiveAttack([0, 2]);
+        expect(gameboard.ships[0].getHits()).toBe(3);
+        expect(ship.isSunk()).toBe(true);
     });
 });

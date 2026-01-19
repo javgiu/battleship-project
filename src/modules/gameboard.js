@@ -1,5 +1,9 @@
 import { createShip } from "./ship";
 
+function coordinatesToKeys(coordinates) {
+    return `${coordinates[0]}, ${coordinates[1]}`;
+}
+
 export function createGameboard(size) {
     const board = [];
 
@@ -17,6 +21,10 @@ export function createGameboard(size) {
     const ship3 = createShip(5);
 
     const ships = [ship1, ship2, ship3];
+
+    const shots = new Set();
+
+    // or just missed shots?
 
     function placeShip(
         ship,
@@ -37,5 +45,25 @@ export function createGameboard(size) {
         }
     }
 
-    return { board, ships, placeShip };
+    function receiveAttack(coordinates) {
+        const x = coordinates[0];
+        const y = coordinates[1];
+
+        if (x > 7 || x < 0 || y < 0 || y > 7)
+            throw new Error("Invalid coordinates passed in");
+
+        if (shots.has(coordinatesToKeys(coordinates)))
+            throw new Error("Shot already executed");
+
+        shots.add(coordinatesToKeys(coordinates));
+
+        if (!ships.includes(board[x][y])) return null;
+
+        const ship = board[x][y];
+        ship.hit();
+
+        return board[x][y];
+    }
+
+    return { board, ships, placeShip, receiveAttack };
 }
