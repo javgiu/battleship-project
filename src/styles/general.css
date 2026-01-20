@@ -1,0 +1,78 @@
+body {
+    background: linear-gradient(rgb(0, 0, 27), rgb(1, 1, 68)) no-repeat;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+}
+
+header,
+footer {
+    text-align: center;
+    padding: 2rem;
+}
+
+main {
+    flex: 1;
+    display: grid;
+    place-items: center;
+}
+
+#start-menu {
+    display: none;
+}
+
+.game {
+    padding: 2rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.player1,
+.player2 {
+    padding: 2rem;
+}
+
+.footer {
+    color: goldenrod;
+}
+
+.title {
+    font-size: 3rem;
+    color: goldenrod;
+}
+
+.url {
+    position: relative;
+    height: 30px;
+}
+
+.url::before {
+    content: "";
+    height: 2px;
+    background-color: goldenrod;
+    width: calc(100% + 5px);
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.url:hover::before {
+    height: calc(100% + 5px);
+    background-color: rgba(255, 217, 0, 0.144);
+}
+
+.url:visited {
+    color: rgb(255, 227, 71);
+}
+
+@media (width < 600px) {
+    .game {
+        flex-direction: column;
+    }
+}

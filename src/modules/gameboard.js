@@ -28,10 +28,10 @@ export function createGameboard(size) {
     // or just missed shots?
 
     function placeShip(
-        ship,
-        position = { coordinates: [0, 0], disposition: "horizontal" }
+        shipIndex,
+        position = { coordinates: [0, 0], disposition: "horizontal" },
     ) {
-        const length = ship.length;
+        const length = ships[shipIndex].length;
         const x = position.coordinates[0];
         const y = position.coordinates[1];
         if (x > 7 || x < 0 || y < 0 || y > 7)
@@ -41,8 +41,10 @@ export function createGameboard(size) {
         if (position.disposition === "vertical" && x + length > 8)
             throw new Error("No enough vertical room");
         for (let i = 0; i < length; i++) {
-            if (position.disposition === "horizontal") board[x][y + i] = ship;
-            if (position.disposition === "vertical") board[x + i][y] = ship;
+            if (position.disposition === "horizontal")
+                board[x][y + i] = ships[shipIndex];
+            if (position.disposition === "vertical")
+                board[x + i][y] = ships[shipIndex];
         }
     }
 
