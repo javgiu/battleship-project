@@ -1,4 +1,6 @@
 import { createGameboard } from "./gameboard.js";
+import { getRandomCoordinates } from "../utilities/computer-coordinates.js";
+import { coordinatesToKeys } from "../utilities/converters.js";
 
 function createPlayer(
     playerId,
@@ -17,11 +19,12 @@ function createPlayer(
         turn = false;
     };
 
-    const isTurn = () => turn;
+    const isTurnToAttack = () => turn;
 
-    const receiveAttack = (coordinates) => {
-        if (isTurn()) {
+    const receiveAttack = (coordinates, slot) => {
+        if (!isTurnToAttack()) {
             const target = gameboard.receiveAttack(coordinates);
+            slot.classList.add("shot");
             if (target === null) changePlayersTurns();
         }
         return;
@@ -32,17 +35,36 @@ function createPlayer(
     };
 
     const getBoard = () => gameboard.board;
-    return {
+
+    const base = {
         type,
         id,
         name,
-        isTurn,
+        isTurnToAttack,
         receiveAttack,
         placeShip,
         startTurn,
         stopTurn,
         getBoard,
     };
+
+    if (type === "computer") {
+        const attacks = new Set();
+        return {
+            ...base,
+            attack: () => {
+                let coordinates;
+                do {
+                    coordinates = getRandomCoordinates(gameboard.board.length);
+                } while (attacks.has(coordinatesToKeys(coordinates)));
+                attacks.add(coordinatesToKeys(coordinates));
+
+                return coordinates;
+            },
+        };
+    }
+
+    return base;
 }
 
 //function checkPlayerTurn() {
@@ -53,7 +75,7 @@ function createPlayer(
 // }
 
 const player1 = createPlayer(1, "Javier");
-const player2 = createPlayer(2, "Giulianna");
+const computer = createPlayer(2, "Giulianna", "computer");
 
 export const placePlayersShips = () => {
     player1.placeShip(0, {
@@ -61,7 +83,7 @@ export const placePlayersShips = () => {
         disposition: "horizontal",
     });
 
-    player2.placeShip(0, {
+    computer.placeShip(0, {
         coordinates: [0, 0],
         disposition: "horizontal",
     });
@@ -71,12 +93,12 @@ export const placePlayersShips = () => {
         disposition: "vertical",
     });
 
-    player2.placeShip(1, {
+    computer.placeShip(1, {
         coordinates: [3, 7],
         disposition: "vertical",
     });
 };
-export const players = [player1, player2];
+export const players = [player1, computer];
 
 export const initPlayerTurn = (playerId) => {
     players[playerId - 1].startTurn();
@@ -84,6 +106,6 @@ export const initPlayerTurn = (playerId) => {
 
 const changePlayersTurns = () => {
     players.forEach((player) => {
-        player.isTurn() ? player.stopTurn() : player.startTurn();
+        player.isTurnToAttack() ? player.stopTurn() : player.startTurn();
     });
 };

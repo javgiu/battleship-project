@@ -1,8 +1,5 @@
 import { createShip } from "./ship";
-
-function coordinatesToKeys(coordinates) {
-    return `${coordinates[0]}, ${coordinates[1]}`;
-}
+import { coordinatesToKeys } from "../utilities/converters";
 
 export function createGameboard(size) {
     const board = [];
