@@ -33,6 +33,14 @@ main {
 .player1,
 .player2 {
     padding: 2rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .footer {
@@ -71,7 +79,7 @@ main {
     color: rgb(255, 227, 71);
 }
 
-@media (width < 600px) {
+@media (width < 750px) {
     .game {
         flex-direction: column;
     }

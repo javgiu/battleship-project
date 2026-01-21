@@ -12,7 +12,7 @@ export function createGameboard(size) {
     for (let i = 0; i < size; i++) {
         board[i] = [];
         for (let j = 0; j < size; j++) {
-            board[i][j] = [];
+            board[i][j] = null;
         }
     }
 
@@ -49,16 +49,14 @@ export function createGameboard(size) {
     }
 
     function receiveAttack(coordinates) {
+        if (shots.has(coordinatesToKeys(coordinates)))
+            throw new Error("Shot already executed");
         const x = coordinates[0];
         const y = coordinates[1];
+        shots.add(coordinatesToKeys(coordinates));
 
         if (x > 7 || x < 0 || y < 0 || y > 7)
             throw new Error("Invalid coordinates passed in");
-
-        if (shots.has(coordinatesToKeys(coordinates)))
-            throw new Error("Shot already executed");
-
-        shots.add(coordinatesToKeys(coordinates));
 
         if (!ships.includes(board[x][y])) {
             missedShots.push(coordinates);
