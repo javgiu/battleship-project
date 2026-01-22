@@ -22,12 +22,13 @@ function createPlayer(
     const isTurnToAttack = () => turn;
 
     const receiveAttack = (coordinates, slot) => {
-        if (!isTurnToAttack()) {
-            const target = gameboard.receiveAttack(coordinates);
-            slot.classList.add("shot");
-            if (target === null) changePlayersTurns();
+        slot.classList.add("shot");
+        const result = gameboard.receiveAttack(coordinates);
+        if (lost()) {
+            stopPlayers();
+            return "EndGame";
         }
-        return;
+        return result;
     };
 
     const placeShip = (shipIndex, position) => {
@@ -35,6 +36,10 @@ function createPlayer(
     };
 
     const getBoard = () => gameboard.board;
+
+    const lost = () => {
+        return gameboard.allShipsSunk();
+    };
 
     const base = {
         type,
@@ -46,6 +51,7 @@ function createPlayer(
         startTurn,
         stopTurn,
         getBoard,
+        lost,
     };
 
     if (type === "computer") {
@@ -97,6 +103,15 @@ export const placePlayersShips = () => {
         coordinates: [3, 7],
         disposition: "vertical",
     });
+    player1.placeShip(2, {
+        coordinates: [3, 7],
+        disposition: "vertical",
+    });
+
+    computer.placeShip(2, {
+        coordinates: [3, 2],
+        disposition: "vertical",
+    });
 };
 export const players = [player1, computer];
 
@@ -104,8 +119,12 @@ export const initPlayerTurn = (playerId) => {
     players[playerId - 1].startTurn();
 };
 
-const changePlayersTurns = () => {
+export const changePlayersTurns = () => {
     players.forEach((player) => {
         player.isTurnToAttack() ? player.stopTurn() : player.startTurn();
     });
 };
+
+function stopPlayers() {
+    players.forEach((player) => player.stopTurn());
+}

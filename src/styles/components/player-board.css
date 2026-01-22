@@ -6,6 +6,11 @@
     flex-wrap: wrap;
 }
 
+.board.game-ended {
+    pointer-events: disabled;
+    opacity: 0.5;
+}
+
 .slot {
     background-color: white;
     height: calc(100% / 8);

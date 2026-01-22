@@ -1,11 +1,12 @@
-import { players } from "../modules/players";
+import { players, changePlayersTurns } from "../modules/players";
 import {
     convertStringToNumbersArray,
     coordinatesToKeys,
 } from "../utilities/converters";
 
+const boardDivs = [...document.querySelectorAll(".board")];
+
 function renderPlayersBoards(players) {
-    const boardDivs = [...document.querySelectorAll(".board")];
     players.forEach((player, playerIndex) => {
         const playerBoard = player.getBoard();
         const boardDiv = boardDivs[playerIndex];
@@ -38,13 +39,21 @@ function handleComputerAttacks(computerPlayer) {
         const playerHuman = players.find(
             (player) => player.id === 1 && player.type === "human",
         );
-        playerHuman.receiveAttack(
-            convertStringToNumbersArray(slotCoordinates),
-            slotToAttack,
-        );
-        if (computerPlayer.isTurnToAttack()) setTimeout(makeAttack, 1000);
+        if (computerPlayer.isTurnToAttack()) {
+            const result = playerHuman.receiveAttack(
+                convertStringToNumbersArray(slotCoordinates),
+                slotToAttack,
+            );
+            if (result === "EndGame") {
+                endGame();
+                return;
+            }
+            if (result === null) {
+                changePlayersTurns();
+            }
+            if (computerPlayer.isTurnToAttack()) setTimeout(makeAttack, 1000);
+        }
     }
-
     setTimeout(makeAttack, 1000);
 }
 
@@ -66,8 +75,25 @@ function setComputerBoardEvents(computerBoard) {
             const computerPlayer = players.find(
                 (player) => player.id == computerBoard.dataset.id,
             );
-            computerPlayer.receiveAttack(slotCoordinates, slot);
-            handleComputerAttacks(computerPlayer);
+            if (players[0].isTurnToAttack()) {
+                const result = computerPlayer.receiveAttack(
+                    slotCoordinates,
+                    slot,
+                );
+                if (result === "EndGame") {
+                    endGame();
+                    return;
+                }
+                if (result === null) {
+                    changePlayersTurns();
+                    handleComputerAttacks(computerPlayer);
+                }
+            }
         }
     });
+}
+
+function endGame() {
+    const winner = players.find((player) => !player.lost());
+    boardDivs.forEach((board) => board.classList.add("game-ended"));
 }
