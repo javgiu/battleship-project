@@ -30,8 +30,7 @@ main {
     justify-content: center;
 }
 
-.player1,
-.player2 {
+.player {
     padding: 2rem;
     display: flex;
     gap: 1rem;

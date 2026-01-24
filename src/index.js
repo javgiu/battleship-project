@@ -1,8 +1,4 @@
 import "./styles/styles.css";
-import { players, placePlayersShips, initPlayerTurn } from "./modules/players";
-import { renderBoards } from "./components/player-board";
+import { initGame } from "./modules/game";
 
-placePlayersShips();
-initPlayerTurn(1);
-
-renderBoards();
+initGame();

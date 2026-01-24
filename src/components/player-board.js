@@ -4,29 +4,54 @@ import {
     coordinatesToKeys,
 } from "../utilities/converters";
 
-const boardDivs = [...document.querySelectorAll(".board")];
+function createPlayerBoard(player) {
+    const boardDiv = document.createElement("div");
+    boardDiv.className = "board";
+    boardDiv.setAttribute("data-id", player.id);
 
-function renderPlayersBoards(players) {
-    players.forEach((player, playerIndex) => {
-        const playerBoard = player.getBoard();
-        const boardDiv = boardDivs[playerIndex];
-        boardDiv.innerHTML = "";
-        boardDiv.setAttribute("data-id", player.id);
-        boardDiv.innerHTML = playerBoard
-            .flatMap((row, rowIndex) =>
-                row.map((slot, slotIndex) => {
-                    return `
-            <div class="slot ${slot ? "ship" : "empty"}" data-coordinates="${rowIndex},${slotIndex}"></div>
-        `;
-                }),
-            )
-            .join("");
-    });
+    // clear and fill boardDiv
+    const boardFill = player
+        .getBoard()
+        .flatMap((row, rowIndex) =>
+            row.map(
+                (slot, slotIndex) =>
+                    `<div class="slot ${slot ? "ship" : "empty"}" data-coordinates="${rowIndex},${slotIndex}"></div>`,
+            ),
+        )
+        .join("");
+
+    boardDiv.innerHTML = boardFill;
+
+    return boardDiv;
+}
+
+function appendBoardToPlayer(playerDiv, boardDiv) {
+    if (playerDiv.querySelector(".board")) {
+        alert("Board already exist");
+        return;
+    }
+    playerDiv.appendChild(boardDiv);
+}
+
+function renderPlayerBoard(player) {
+    const playerDiv = document.querySelector(`.player[data-id='${player.id}']`);
+
+    if (playerDiv.querySelector(".board")) {
+        playerDiv.querySelector(".board").remove();
+    }
+
+    const boardDiv = createPlayerBoard(player);
+
+    appendBoardToPlayer(playerDiv, boardDiv);
+}
+
+export function renderPlayersBoards(players) {
+    players.forEach((player) => renderPlayerBoard(player));
 }
 
 function handleComputerAttacks(computerPlayer) {
     const player1BoardSlots = [
-        ...document.querySelector(".player1 .board").children,
+        ...document.querySelector(".board[data-id='1']").children,
     ];
 
     function makeAttack() {
@@ -60,7 +85,7 @@ function handleComputerAttacks(computerPlayer) {
 export function renderBoards() {
     renderPlayersBoards(players);
 
-    const player2Board = document.querySelector(".player2 .board");
+    const player2Board = document.querySelector(".board[data-id='2']");
 
     setComputerBoardEvents(player2Board);
 }
@@ -76,6 +101,8 @@ function setComputerBoardEvents(computerBoard) {
                 (player) => player.id == computerBoard.dataset.id,
             );
             if (players[0].isTurnToAttack()) {
+                console.log("click");
+
                 const result = computerPlayer.receiveAttack(
                     slotCoordinates,
                     slot,
@@ -95,5 +122,6 @@ function setComputerBoardEvents(computerBoard) {
 
 function endGame() {
     const winner = players.find((player) => !player.lost());
+    const boardDivs = [...document.querySelectorAll(".board")];
     boardDivs.forEach((board) => board.classList.add("game-ended"));
 }
