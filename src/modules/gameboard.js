@@ -75,5 +75,5 @@ export function createGameboard(size) {
         else return false;
     }
 
-    return { board, ships, placeShip, receiveAttack, allShipsSunk };
+    return { board, ships, placeShip, receiveAttack, allShipsSunk, shots };
 }

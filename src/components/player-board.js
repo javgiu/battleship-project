@@ -1,13 +1,13 @@
-import { players, changePlayersTurns } from "../modules/players";
-import {
-    convertStringToNumbersArray,
-    coordinatesToKeys,
-} from "../utilities/converters";
+import { coordinatesToKeys } from "../utilities/converters";
+
+const isSlotShot = (player, rowIndex, slotIndex) =>
+    player.getShots().has(coordinatesToKeys([rowIndex, slotIndex])) && "shot";
 
 function createPlayerBoard(player) {
     const boardDiv = document.createElement("div");
     boardDiv.className = "board";
     boardDiv.setAttribute("data-id", player.id);
+    boardDiv.setAttribute("data-type", player.type);
 
     // clear and fill boardDiv
     const boardFill = player
@@ -15,7 +15,7 @@ function createPlayerBoard(player) {
         .flatMap((row, rowIndex) =>
             row.map(
                 (slot, slotIndex) =>
-                    `<div class="slot ${slot ? "ship" : "empty"}" data-coordinates="${rowIndex},${slotIndex}"></div>`,
+                    `<div class="slot ${slot ? "ship" : "empty"} ${isSlotShot(player, rowIndex, slotIndex)}" data-coordinates="${rowIndex},${slotIndex}"></div>`,
             ),
         )
         .join("");
@@ -25,15 +25,7 @@ function createPlayerBoard(player) {
     return boardDiv;
 }
 
-function appendBoardToPlayer(playerDiv, boardDiv) {
-    if (playerDiv.querySelector(".board")) {
-        alert("Board already exist");
-        return;
-    }
-    playerDiv.appendChild(boardDiv);
-}
-
-function renderPlayerBoard(player) {
+export function renderPlayerBoard(player) {
     const playerDiv = document.querySelector(`.player[data-id='${player.id}']`);
 
     if (playerDiv.querySelector(".board")) {
@@ -42,86 +34,9 @@ function renderPlayerBoard(player) {
 
     const boardDiv = createPlayerBoard(player);
 
-    appendBoardToPlayer(playerDiv, boardDiv);
+    playerDiv.appendChild(boardDiv);
 }
 
-export function renderPlayersBoards(players) {
+export function renderBoards(players) {
     players.forEach((player) => renderPlayerBoard(player));
-}
-
-function handleComputerAttacks(computerPlayer) {
-    const player1BoardSlots = [
-        ...document.querySelector(".board[data-id='1']").children,
-    ];
-
-    function makeAttack() {
-        const slotCoordinates = coordinatesToKeys(computerPlayer.attack());
-        console.log(slotCoordinates);
-        console.log(player1BoardSlots);
-        const slotToAttack = player1BoardSlots.find(
-            (slot) => slot.dataset.coordinates === slotCoordinates,
-        );
-        const playerHuman = players.find(
-            (player) => player.id === 1 && player.type === "human",
-        );
-        if (computerPlayer.isTurnToAttack()) {
-            const result = playerHuman.receiveAttack(
-                convertStringToNumbersArray(slotCoordinates),
-                slotToAttack,
-            );
-            if (result === "EndGame") {
-                endGame();
-                return;
-            }
-            if (result === null) {
-                changePlayersTurns();
-            }
-            if (computerPlayer.isTurnToAttack()) setTimeout(makeAttack, 1000);
-        }
-    }
-    setTimeout(makeAttack, 1000);
-}
-
-export function renderBoards() {
-    renderPlayersBoards(players);
-
-    const player2Board = document.querySelector(".board[data-id='2']");
-
-    setComputerBoardEvents(player2Board);
-}
-
-function setComputerBoardEvents(computerBoard) {
-    computerBoard.addEventListener("click", (e) => {
-        if (e.target.classList.contains("slot")) {
-            const slot = e.target;
-            const slotCoordinates = convertStringToNumbersArray(
-                slot.dataset.coordinates,
-            );
-            const computerPlayer = players.find(
-                (player) => player.id == computerBoard.dataset.id,
-            );
-            if (players[0].isTurnToAttack()) {
-                console.log("click");
-
-                const result = computerPlayer.receiveAttack(
-                    slotCoordinates,
-                    slot,
-                );
-                if (result === "EndGame") {
-                    endGame();
-                    return;
-                }
-                if (result === null) {
-                    changePlayersTurns();
-                    handleComputerAttacks(computerPlayer);
-                }
-            }
-        }
-    });
-}
-
-function endGame() {
-    const winner = players.find((player) => !player.lost());
-    const boardDivs = [...document.querySelectorAll(".board")];
-    boardDivs.forEach((board) => board.classList.add("game-ended"));
 }

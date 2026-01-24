@@ -21,8 +21,7 @@ function createPlayer(
 
     const isTurnToAttack = () => turn;
 
-    const receiveAttack = (coordinates, slot) => {
-        slot.classList.add("shot");
+    const receiveAttack = (coordinates) => {
         const result = gameboard.receiveAttack(coordinates);
         if (lost()) {
             stopPlayers();
@@ -41,6 +40,8 @@ function createPlayer(
         return gameboard.allShipsSunk();
     };
 
+    const getShots = () => gameboard.shots;
+
     const base = {
         type,
         id,
@@ -52,6 +53,7 @@ function createPlayer(
         stopTurn,
         getBoard,
         lost,
+        getShots,
     };
 
     if (type === "computer") {
@@ -72,13 +74,6 @@ function createPlayer(
 
     return base;
 }
-
-//function checkPlayerTurn() {
-//}
-
-// function changeTurn() {
-
-// }
 
 const player1 = createPlayer(1, "Javier");
 const computer = createPlayer(2, "Giulianna", "computer");
