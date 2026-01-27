@@ -30,7 +30,7 @@ export function createGameboard(size) {
         position = { coordinates: [0, 0], disposition: "horizontal" },
     ) {
         const length = ships[shipIndex].length;
-        const [x, y] = coordinates;
+        const [x, y] = position.coordinates;
         const { disposition } = position;
         if (x > 7 || x < 0 || y < 0 || y > 7)
             throw new Error("Invalid coordinates passed in");
