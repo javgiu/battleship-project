@@ -24,6 +24,7 @@ export function createGameboard(size) {
 
     // or just missed shots?
 
+    // Change this logic to avoid placing ships over each other
     function placeShip(
         shipIndex,
         position = { coordinates: [0, 0], disposition: "horizontal" },

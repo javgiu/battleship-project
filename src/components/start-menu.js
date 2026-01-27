@@ -1,4 +1,4 @@
-import { getPlayerNameFromMenu } from "../modules/game";
+import { populatePlayers } from "../modules/game";
 
 const startMenuSection = document.getElementById("start-menu");
 
@@ -26,22 +26,41 @@ function cleanStartMenu() {
 }
 
 function setStartMenuEvents() {
-    startMenuSection.addEventListener("click", gameModeButtonsEvents);
-    startMenuSection.addEventListener("click", cancelSelection);
-    startMenuSection.addEventListener("click", acceptButtonEvent);
+    startMenuSection.addEventListener("click", handleMenuClick);
 }
 
-function gameModeButtonsEvents(e) {
+function handleMenuClick(e) {
+    if (e.target.id === "cancel-button") {
+        initializeStartMenu();
+        return;
+    }
+    if (e.target.dataset.mode) {
+        handleGameModeSelection(e);
+    }
+}
+
+// Write here logic to choose the game mode
+function handleGameModeSelection(e) {
     if (e.target.dataset.mode === "1-player") {
         cleanStartMenu();
-        renderPlayerNameForm();
+        const playersInfo = [
+            {
+                type: "human",
+                name: "",
+            },
+            {
+                type: "computer",
+                name: "Computer",
+            },
+        ];
+        renderPlayerNameForm(playersInfo);
     }
     if (e.target.dataset.mode === "2-player") {
         alert("Working on it!");
     }
 }
 
-function renderPlayerNameForm() {
+function renderPlayerNameForm(playersInfo) {
     startMenuSection.innerHTML = `
         <div class="player-name-form">
             <h2 class="subtitle">Player name:</h2>
@@ -54,25 +73,27 @@ function renderPlayerNameForm() {
     `;
 
     focusOnInput();
-}
 
-function acceptButtonEvent(e) {
-    // Sould make something to get the player name and then create the players
-    if (e.target.id === "get-name-button") {
-        const input = document.querySelector(".player-name-form input");
-        if (input.value === "") return;
-        getPlayerNameFromMenu(input.value);
+    const input = document.querySelector(".player-name-form input");
+    const acceptButton = document.getElementById("get-name-button");
+
+    const handleAccept = (e) => {
+        // Should make something to get the player name and then create the players
+        if (input.value === "") {
+            return;
+        }
+        playersInfo[0].name = input.value;
+        acceptButton.removeEventListener("click", handleAccept);
         cleanStartMenu();
-    }
-}
+        populatePlayers(playersInfo);
+    };
 
-function cancelSelection(e) {
-    if (e.target.id === "cancel-button") {
-        initializeStartMenu();
-    }
+    acceptButton.addEventListener("click", handleAccept);
 }
 
 function focusOnInput() {
     const input = document.querySelector(".player-name-form input");
     input.focus();
 }
+
+// Create a function to handle validity of input and add press enter
