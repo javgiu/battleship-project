@@ -9,15 +9,34 @@ import {
     coordinatesToKeys,
     convertStringToNumbersArray,
 } from "../utilities/converters";
-
+import { initializeStartMenu } from "../components/start-menu";
+let playerName;
 const [playerHuman, playerComputer] = players;
 const gameDiv = document.querySelector(".game");
+const gameSections = document.querySelectorAll("section");
 
 export function initGame() {
+    showSection("start-menu");
+    initializeStartMenu();
     placePlayersShips();
     renderBoards(players);
     setComputerBoardEvents();
     initPlayerTurn(1);
+}
+
+export function getPlayerNameFromMenu(name) {
+    playerName = name;
+    showSection("game");
+}
+
+function showSection(sectionId) {
+    gameSections.forEach((section) => {
+        if (section.id === sectionId) {
+            section.classList.remove("hide");
+        } else {
+            section.classList.add("hide");
+        }
+    });
 }
 
 function handleComputerAttacks() {

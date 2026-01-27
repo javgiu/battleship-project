@@ -2,7 +2,7 @@ import { createGameboard } from "./gameboard.js";
 import { getRandomCoordinates } from "../utilities/computer-coordinates.js";
 import { coordinatesToKeys } from "../utilities/converters.js";
 
-function createPlayer(
+export function createPlayer(
     playerId,
     playerName = "Player",
     playerType = "human" || "computer",
@@ -108,6 +108,8 @@ export const placePlayersShips = () => {
         disposition: "vertical",
     });
 };
+
+// Move this to game
 export const players = [player1, computer];
 
 export const initPlayerTurn = (playerId) => {

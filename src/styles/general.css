@@ -18,10 +18,6 @@ main {
     place-items: center;
 }
 
-#start-menu {
-    display: none;
-}
-
 .game {
     padding: 2rem;
     display: flex;
@@ -51,6 +47,11 @@ main {
     color: goldenrod;
 }
 
+.subtitle {
+    font-size: 2rem;
+    color: goldenrod;
+}
+
 .url {
     position: relative;
     height: 30px;
@@ -76,6 +77,10 @@ main {
 
 .url:visited {
     color: rgb(255, 227, 71);
+}
+
+.hide {
+    display: none;
 }
 
 @media (width < 750px) {
