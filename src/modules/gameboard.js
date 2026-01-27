@@ -30,20 +30,33 @@ export function createGameboard(size) {
         position = { coordinates: [0, 0], disposition: "horizontal" },
     ) {
         const length = ships[shipIndex].length;
-        const x = position.coordinates[0];
-        const y = position.coordinates[1];
+        const [x, y] = coordinates;
+        const { disposition } = position;
         if (x > 7 || x < 0 || y < 0 || y > 7)
             throw new Error("Invalid coordinates passed in");
-        if (position.disposition === "horizontal" && y + length > 8)
+        if (disposition === "horizontal" && y + length > 8)
             throw new Error("No enough horizontal room");
-        if (position.disposition === "vertical" && x + length > 8)
+        if (disposition === "vertical" && x + length > 8)
             throw new Error("No enough vertical room");
+
+        const positionsToPlace = [];
         for (let i = 0; i < length; i++) {
-            if (position.disposition === "horizontal")
-                board[x][y + i] = ships[shipIndex];
-            if (position.disposition === "vertical")
-                board[x + i][y] = ships[shipIndex];
+            const newPosition =
+                disposition === "horizontal" ? [x, y + i] : [x + i, y];
+            positionsToPlace.push(newPosition);
         }
+        // check all positions are free
+        const allPositionsFree = positionsToPlace.every(
+            ([row, col]) => board[row][col] === null,
+        );
+
+        if (!allPositionsFree) {
+            throw new Error("Slots in use");
+        }
+
+        positionsToPlace.forEach(([row, col]) => {
+            board[row][col] = ships[shipIndex];
+        });
     }
 
     function receiveAttack(coordinates) {
