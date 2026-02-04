@@ -1,4 +1,4 @@
-import { createPlayer } from "./players";
+import { createPlayer, ResetAvailablePlayerIds } from "./players";
 import { renderBoards, renderPlayerBoard } from "../components/player-board";
 import {
     coordinatesToKeys,
@@ -6,9 +6,12 @@ import {
 } from "../utilities/converters";
 import { initializeStartMenu } from "../components/start-menu";
 import { initShipPlacement } from "../components/ships-placement";
+import { showResults } from "../components/results";
 
+let boardClickHandler = null;
 const players = [];
-let playerHuman, playerComputer;
+let playerHuman = null;
+let playerComputer = null;
 const gameDiv = document.querySelector(".game");
 const gameSections = document.querySelectorAll("section");
 
@@ -95,7 +98,7 @@ function handleComputerAttacks() {
 }
 
 function setComputerBoardEvents() {
-    gameDiv.addEventListener("click", (e) => {
+    boardClickHandler = (e) => {
         const isSlot = e.target.classList.contains("slot");
         const onComputerBoard =
             e.target.parentElement.dataset.type === "computer";
@@ -125,7 +128,8 @@ function setComputerBoardEvents() {
                 }
             }
         }
-    });
+    };
+    gameDiv.addEventListener("click", boardClickHandler);
 }
 
 function endGame() {
@@ -133,6 +137,10 @@ function endGame() {
     const winner = players.find((player) => !player.lost());
     const boardDivs = [...document.querySelectorAll(".board")];
     boardDivs.forEach((board) => board.classList.add("game-ended"));
+    showSection("results");
+    showResults(winner, () => {
+        restartGame();
+    });
 }
 
 const initPlayerTurn = (playerId) => {
@@ -147,4 +155,24 @@ const changePlayersTurns = () => {
 
 function stopPlayers() {
     players.forEach((player) => player.stopTurn());
+}
+
+function restartGame() {
+    resetState();
+    initGame();
+}
+
+function resetState() {
+    ResetAvailablePlayerIds();
+    removeComputerBoardEvents();
+    players.length = 0;
+    playerHuman = null;
+    playerComputer = null;
+}
+
+function removeComputerBoardEvents() {
+    if (boardClickHandler) {
+        gameDiv.removeEventListener("click", boardClickHandler);
+        boardClickHandler = null;
+    }
 }

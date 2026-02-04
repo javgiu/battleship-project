@@ -153,7 +153,7 @@ function placeShip(e, player, ships) {
             renderPlacementUI(ships[currentIndex], currentOrientation);
         }
     } catch (error) {
-        console.error(error.message);
+        console.error(error);
     }
 }
 

@@ -8,6 +8,10 @@ function getAvailableId() {
     return nextAvailableId++;
 }
 
+export function ResetAvailablePlayerIds() {
+    nextAvailableId = 1;
+}
+
 export function createPlayer(playerType = "computer", playerName = "Player") {
     let turn = false;
     const name = playerName;
