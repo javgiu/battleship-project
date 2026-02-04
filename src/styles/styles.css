@@ -1,4 +1,5 @@
 @import "./reset.css";
 @import "./general.css";
 @import "./components/start-menu.css";
+@import "./components/ships-placement.css";
 @import "./components/player-board.css";

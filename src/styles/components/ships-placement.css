@@ -1,0 +1,92 @@
+#ship-placement {
+    padding: 2rem;
+}
+
+.placement-conatainer {
+    display: flex;
+    gap: 3rem;
+    align-items: center;
+}
+
+.placement-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.current-ships-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.current-ships-info h3 {
+    font-size: 1.5rem;
+}
+
+.visual-ship {
+    display: flex;
+    gap: 5px;
+    background-color: rgb(48, 46, 46);
+    transition: all 0.3s ease-in-out;
+    transform-origin: center;
+}
+
+.visual-ship:hover {
+    scale: 1.2;
+}
+
+.visual-ship.horizontal {
+    /* transform: rotate(0deg); */
+    flex-direction: row;
+}
+
+.visual-ship.vertical {
+    /* transform: rotate(90deg); */
+    flex-direction: column;
+}
+
+.visual-ship .ship-piece {
+    width: 50px;
+    height: 50px;
+    background-color: rgb(24, 20, 20);
+}
+
+.placement-info button {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 10px;
+    border: none;
+}
+
+.placement-board {
+    display: grid;
+    grid-template-columns: repeat(8, 50px);
+    gap: 5px;
+}
+
+.placement-slot {
+    background-color: white;
+    width: 50px;
+    height: 50px;
+    transition: all 0.1s ease-in-out;
+}
+
+.placement-slot.valid {
+    background-color: blue;
+}
+
+.placement-slot.invalid {
+    background-color: red;
+}
+
+.placement-board.ship {
+    background-color: gray;
+}
+
+@media (max-width: 800px) {
+    .placement-conatainer {
+        flex-direction: column;
+    }
+}

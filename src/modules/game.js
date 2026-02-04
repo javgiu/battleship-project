@@ -5,6 +5,7 @@ import {
     convertStringToNumbersArray,
 } from "../utilities/converters";
 import { initializeStartMenu } from "../components/start-menu";
+import { initShipPlacement } from "../components/ships-placement";
 
 const players = [];
 let playerHuman, playerComputer;
@@ -21,35 +22,24 @@ export function populatePlayers(playersInfo) {
         players.push(createPlayer(playerInfo.type, playerInfo.name));
     });
     [playerHuman, playerComputer] = players;
-    showSection("game");
-    placePlayersShips();
-    renderBoards(players);
-    setComputerBoardEvents();
-    initPlayerTurn(1);
+    showSection("ship-placement");
+    initShipPlacement(playerHuman, () => {
+        showSection("game");
+        placeComputerShips();
+        renderBoards(players);
+        setComputerBoardEvents();
+        initPlayerTurn(1);
+    });
 }
 
 // Change logic to allow player place ships
-export const placePlayersShips = () => {
-    playerHuman.placeShip(0, {
-        coordinates: [0, 0],
-        disposition: "horizontal",
-    });
-
+export const placeComputerShips = () => {
     playerComputer.placeShip(0, {
         coordinates: [0, 0],
         disposition: "horizontal",
     });
 
-    playerHuman.placeShip(1, {
-        coordinates: [3, 3],
-        disposition: "vertical",
-    });
-
     playerComputer.placeShip(1, {
-        coordinates: [3, 7],
-        disposition: "vertical",
-    });
-    playerHuman.placeShip(2, {
         coordinates: [3, 7],
         disposition: "vertical",
     });
@@ -74,20 +64,30 @@ function handleComputerAttacks() {
     function makeAttack() {
         const slotCoordinates = coordinatesToKeys(playerComputer.attack());
         if (playerComputer.isTurnToAttack()) {
-            const result = playerHuman.receiveAttack(
-                convertStringToNumbersArray(slotCoordinates),
-            );
-            renderPlayerBoard(playerHuman);
+            try {
+                const result = playerHuman.receiveAttack(
+                    convertStringToNumbersArray(slotCoordinates),
+                );
+                renderPlayerBoard(playerHuman);
 
-            if (result === "EndGame") {
-                endGame();
-                return;
-            }
-            if (result === null) {
-                changePlayersTurns();
-            }
-            if (playerComputer.isTurnToAttack()) {
-                setTimeout(makeAttack, 1000);
+                if (result === "EndGame") {
+                    endGame();
+                    return;
+                }
+
+                if (result === null) {
+                    changePlayersTurns();
+                }
+
+                if (playerComputer.isTurnToAttack()) {
+                    setTimeout(makeAttack, 1000);
+                }
+            } catch (error) {
+                console.warn(error.message);
+
+                if (playerComputer.isTurnToAttack()) {
+                    setTimeout(makeAttack, 1000);
+                }
             }
         }
     }
@@ -104,16 +104,24 @@ function setComputerBoardEvents() {
             const slotCoordinates = convertStringToNumbersArray(
                 slot.dataset.coordinates,
             );
+
             if (playerHuman.isTurnToAttack()) {
-                const result = playerComputer.receiveAttack(slotCoordinates);
-                renderPlayerBoard(playerComputer);
-                if (result === "EndGame") {
-                    endGame();
-                    return;
-                }
-                if (result === null) {
-                    changePlayersTurns();
-                    handleComputerAttacks(playerComputer);
+                try {
+                    const result =
+                        playerComputer.receiveAttack(slotCoordinates);
+                    renderPlayerBoard(playerComputer);
+
+                    if (result === "EndGame") {
+                        endGame();
+                        return;
+                    }
+
+                    if (result === null) {
+                        changePlayersTurns();
+                        handleComputerAttacks(playerComputer);
+                    }
+                } catch (error) {
+                    console.warn(error.message);
                 }
             }
         }
