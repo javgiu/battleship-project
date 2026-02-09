@@ -134,7 +134,7 @@ function showPreview(e, ships) {
 }
 
 function placeShip(e, player, ships) {
-    const disposition = currentOrientation;
+    const orientation = currentOrientation;
     const coordinates = convertStringToNumbersArray(
         e.target.dataset.coordinates,
     );
@@ -142,7 +142,7 @@ function placeShip(e, player, ships) {
     try {
         player.placeShip(ships[currentIndex].index, {
             coordinates,
-            disposition,
+            orientation,
         });
         showShipPlaced();
         currentIndex++;

@@ -1,5 +1,9 @@
 import { createGameboard } from "./gameboard.js";
-import { getRandomCoordinates } from "../utilities/computer-coordinates.js";
+import {
+    getRandomCoordinates,
+    getRandomOrientation,
+    getRandomValidCoordinates,
+} from "../utilities/auxiliar-functions.js";
 import { coordinatesToKeys } from "../utilities/converters.js";
 
 let nextAvailableId = 1;
@@ -46,6 +50,7 @@ export function createPlayer(playerType = "computer", playerName = "Player") {
     };
 
     const getShots = () => gameboard.shots;
+    const getShipsCoordinates = () => gameboard.getUsedCoordinates();
 
     const base = {
         type,
@@ -59,6 +64,7 @@ export function createPlayer(playerType = "computer", playerName = "Player") {
         getBoard,
         lost,
         getShots,
+        getShipsCoordinates,
     };
 
     if (type === "computer") {
@@ -73,6 +79,60 @@ export function createPlayer(playerType = "computer", playerName = "Player") {
                 attacks.add(coordinatesToKeys(coordinates));
 
                 return coordinates;
+            },
+
+            /////////////// Working heeeereeeee /////////
+
+            placeShipsRandomly: () => {
+                function isPositionValid(x, y, shipLength, orientation) {
+                    if (
+                        (orientation === "vertical" &&
+                            x + shipLength > gameboard.board.length) ||
+                        (orientation === "horizontal" &&
+                            y + shipLength > gameboard.board.length)
+                    )
+                        return false;
+                    for (let i = 0; i < shipLength; i++) {
+                        const checkX = orientation === "vertical" ? x + i : x;
+                        const checkY = orientation === "horizontal" ? y + i : y;
+
+                        if (
+                            getShipsCoordinates().has(
+                                coordinatesToKeys([checkX, checkY]),
+                            )
+                        )
+                            return false;
+                    }
+                    return true;
+                }
+                gameboard.ships.forEach((ship, shipIndex) => {
+                    const validPositions = [];
+                    ["horizontal", "vertical"].forEach((orientation) => {
+                        for (let i = 0; i < gameboard.board.length; i++) {
+                            for (let j = 0; j < gameboard.board.length; j++) {
+                                if (
+                                    isPositionValid(
+                                        i,
+                                        j,
+                                        ship.length,
+                                        orientation,
+                                    )
+                                )
+                                    validPositions.push({
+                                        coordinates: [i, j],
+                                        orientation,
+                                    });
+                            }
+                        }
+                    });
+
+                    const validPosition =
+                        validPositions[
+                            Math.floor(Math.random() * validPositions.length)
+                        ];
+
+                    placeShip(shipIndex, validPosition);
+                });
             },
         };
     }

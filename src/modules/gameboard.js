@@ -19,30 +19,28 @@ export function createGameboard(size) {
 
     const ships = [ship1, ship2, ship3];
 
+    const usedSlots = new Set();
     const shots = new Set();
-    const missedShots = [];
+    const missedShots = new Set();
 
-    // or just missed shots?
-
-    // Change this logic to avoid placing ships over each other
     function placeShip(
         shipIndex,
-        position = { coordinates: [0, 0], disposition: "horizontal" },
+        position = { coordinates: [0, 0], orientation: "horizontal" },
     ) {
         const length = ships[shipIndex].length;
         const [x, y] = position.coordinates;
-        const { disposition } = position;
+        const { orientation } = position;
         if (x > 7 || x < 0 || y < 0 || y > 7)
             throw new Error("Invalid coordinates passed in");
-        if (disposition === "horizontal" && y + length > 8)
+        if (orientation === "horizontal" && y + length > 8)
             throw new Error("No enough horizontal room");
-        if (disposition === "vertical" && x + length > 8)
+        if (orientation === "vertical" && x + length > 8)
             throw new Error("No enough vertical room");
 
         const positionsToPlace = [];
         for (let i = 0; i < length; i++) {
             const newPosition =
-                disposition === "horizontal" ? [x, y + i] : [x + i, y];
+                orientation === "horizontal" ? [x, y + i] : [x + i, y];
             positionsToPlace.push(newPosition);
         }
         // check all positions are free
@@ -56,6 +54,7 @@ export function createGameboard(size) {
 
         positionsToPlace.forEach(([row, col]) => {
             board[row][col] = ships[shipIndex];
+            usedSlots.add(coordinatesToKeys([row, col]));
         });
     }
 
@@ -70,7 +69,7 @@ export function createGameboard(size) {
             throw new Error("Invalid coordinates passed in");
 
         if (!ships.includes(board[x][y])) {
-            missedShots.push(coordinates);
+            missedShots.add(coordinatesToKeys(coordinates));
             return null;
         }
 
@@ -89,5 +88,22 @@ export function createGameboard(size) {
         else return false;
     }
 
-    return { board, ships, placeShip, receiveAttack, allShipsSunk, shots };
+    function getUsedCoordinates() {
+        return usedSlots;
+    }
+
+    function getMissedShots() {
+        return missedShots;
+    }
+
+    return {
+        board,
+        ships,
+        placeShip,
+        receiveAttack,
+        allShipsSunk,
+        shots,
+        getUsedCoordinates,
+        getMissedShots,
+    };
 }

@@ -28,7 +28,7 @@ export function populatePlayers(playersInfo) {
     showSection("ship-placement");
     initShipPlacement(playerHuman, () => {
         showSection("game");
-        placeComputerShips();
+        playerComputer.placeShipsRandomly();
         renderBoards(players);
         setComputerBoardEvents();
         initPlayerTurn(1);
