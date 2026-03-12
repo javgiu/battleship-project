@@ -15,13 +15,19 @@
             <section id="start-menu"></section>
 
             <section id="ship-placement">
-                <div class="placement-conatainer">
-                    <div class="placement-info">
-                        <h2 class="subtitle">Place your ships</h2>
-                        <div class="current-ships-info"></div>
-                        <button id="rotate-ship">Rotate</button>
+                <div class="placement-container">
+                    <div class="ships-list">
+                        <h3 class="subtitle">Place your ships</h3>
+                        <div class="draggable-ships"></div>
                     </div>
-                    <div class="placement-board"></div>
+                    <div class="placement-board-container">
+                        <div class="placement-board"></div>
+                        <button
+                            id="finish-placement-btn"
+                            disabled>
+                            Continue
+                        </button>
+                    </div>
                 </div>
             </section>
 
