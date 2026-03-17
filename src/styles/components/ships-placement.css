@@ -29,7 +29,6 @@
     transition: all 0.3s ease-in-out;
     transform-origin: center;
     position: relative;
-    transition: all 0.3s ease-in-out;
 }
 
 .draggable-ship.vertical {
@@ -38,15 +37,6 @@
 .draggable-ship.horizontal {
     flex-direction: row;
 }
-
-/* .draggable-ship:hover {
-    scale: 1.2;
-} */
-
-/* .draggable-ship.horizontal {
-    transform: rotate(0deg);
-    flex-direction: row;
-} */
 
 .draggable-ship .ship-piece {
     width: 50px;
@@ -70,6 +60,10 @@
 
 .draggable-ship button:hover {
     opacity: 1;
+}
+
+.draggable-ship.dragging {
+    visibility: hidden;
 }
 
 .draggable-ship.on-board {

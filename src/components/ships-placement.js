@@ -4,8 +4,6 @@ import {
 } from "../utilities/converters";
 
 let isPlacementActive = false;
-let currentIndex = 0;
-let currentOrientation = "horizontal";
 let onComplete = null;
 let actualPlayer = null;
 const ships = [
@@ -62,7 +60,6 @@ export function initShipPlacement(player, callback) {
 
     renderShipsList();
     renderPlacementBoard(player);
-    // attachEvents();
     attachDragEvents();
 }
 
@@ -106,6 +103,14 @@ function renderShipsOnBoard() {
     placedShips.forEach((shipData) => {
         const shipElement = createShipElement(shipData);
         positionShipOnBoard(shipElement, shipData);
+
+        shipElement.addEventListener("dragstart", handleDragStart);
+        shipElement.addEventListener("dragend", handleDragEnd);
+
+        const rotateBtn = shipElement.querySelector(".rotate-ship-btn");
+        if (rotateBtn) {
+            rotateBtn.addEventListener("click", handleRotateClick);
+        }
 
         const placementBoard = document.querySelector(".placement-board");
         placementBoard.appendChild(shipElement);
@@ -219,6 +224,36 @@ function handleRotateClick(e) {
     const newOrientation =
         currentOrientation === "horizontal" ? "vertical" : "horizontal";
 
+    if (shipElement.classList.contains("on-board")) {
+        const shipPlacedIndex = placedShips.findIndex(
+            (ship) => ship.index == shipElement.dataset.index,
+        );
+
+        const shipData = placedShips[shipPlacedIndex];
+
+        const [x, y] = shipData.coordinates;
+
+        placedShips.splice(shipPlacedIndex, 1);
+
+        if (isPositionOccupied(x, y, shipData.length, newOrientation)) {
+            placedShips.push(shipData);
+            console.warn("Can't rotate, position occupied");
+            return;
+        }
+        if (
+            (newOrientation === "vertical" && x + shipData.length > 8) ||
+            (newOrientation === "horizontal" && y + shipData.length > 8)
+        ) {
+            placedShips.push(shipData);
+            console.warn("Can't rotate, out of board");
+            return;
+        } else {
+            shipData.orientation = newOrientation;
+            placedShips.push(shipData);
+            console.assert("Rotated");
+        }
+    }
+
     shipElement.dataset.orientation = newOrientation;
 
     shipElement.classList.remove("vertical", "horizontal");
@@ -228,6 +263,10 @@ function handleRotateClick(e) {
 function handleDragStart(e) {
     const shipElement = e.target.closest(".draggable-ship");
     draggedShip = shipElement;
+
+    setTimeout(() => {
+        shipElement.remove();
+    }, 0);
 
     draggedShipData = {
         index: parseInt(shipElement.dataset.index),
@@ -254,6 +293,17 @@ function handleDragStart(e) {
 
     draggedShipData.offsetPieces = offsetPieces;
 
+    if (shipElement.classList.contains("on-board")) {
+        const indexToRemove = placedShips.findIndex(
+            (ship) => ship.index === draggedShipData.index,
+        );
+        if (indexToRemove >= 0) {
+            draggedShipData.originalPosition = placedShips[indexToRemove];
+
+            placedShips.splice(indexToRemove, 1);
+        }
+    }
+
     shipElement.classList.add("dragging");
 
     e.dataTransfer.effectAllowed = "move";
@@ -274,7 +324,13 @@ function handleDrop(e) {
         ? e.target
         : e.target.closest(".placement-slot");
 
-    if (!targetSlot) return;
+    if (!targetSlot) {
+        if (draggedShipData.originalPosition) {
+            placedShips.push(draggedShipData.originalPosition);
+            renderShipsOnBoard();
+        }
+        return;
+    }
 
     let [x, y] = convertStringToNumbersArray(targetSlot.dataset.coordinates);
 
@@ -288,6 +344,7 @@ function handleDrop(e) {
 
     if (x < 0 || y < 0 || x > 7 || y > 7) {
         console.warn("Coordinates out of board");
+        restoreOriginalPosition();
         return;
     }
 
@@ -296,11 +353,13 @@ function handleDrop(e) {
 
     if (orientation === "horizontal" && y + shipLength > 8) {
         console.warn("Not enough horizontal space");
+        restoreOriginalPosition();
         return;
     }
 
     if (orientation === "vertical" && x + shipLength > 8) {
         console.warn("Not enough vertical space");
+        restoreOriginalPosition();
         return;
     }
 
@@ -308,28 +367,25 @@ function handleDrop(e) {
         isPositionOccupied(x, y, shipLength, orientation, draggedShipData.index)
     ) {
         console.warn("Position occupied by other ship");
+        restoreOriginalPosition();
         return;
     }
-
-    const existingIndex = placedShips.findIndex(
-        (ship) => ship.index === draggedShipData.index,
-    );
 
     const newShipData = {
         index: draggedShipData.index,
         coordinates: [x, y],
         orientation: orientation,
+        name: draggedShipData.name,
+        length: draggedShipData.length,
     };
 
-    if (existingIndex >= 0) {
-        placedShips[existingIndex] = newShipData;
-    } else {
-        placedShips.push(newShipData);
-        console.dir(draggedShip);
+    placedShips.push(newShipData);
 
-        if (draggedShip.parentElement.classList.contains("draggable-ships")) {
-            draggedShip.remove();
-        }
+    if (
+        draggedShip.parentElement &&
+        draggedShip.parentElement.classList.contains("draggable-ships")
+    ) {
+        draggedShip.remove();
     }
 
     renderShipsOnBoard();
@@ -337,7 +393,15 @@ function handleDrop(e) {
     updateFinishButton();
 }
 
-function isPositionOccupied(x, y, length, orientation, excludeIndex = null) {
+function restoreOriginalPosition() {
+    if (draggedShipData.originalPosition) {
+        console.log("restoring position");
+        placedShips.push(draggedShipData.originalPosition);
+        renderShipsOnBoard();
+    }
+}
+
+function isPositionOccupied(x, y, length, orientation) {
     const newShipSlot = new Set();
     for (let i = 0; i < length; i++) {
         const slotX = orientation === "vertical" ? x + i : x;
@@ -345,22 +409,16 @@ function isPositionOccupied(x, y, length, orientation, excludeIndex = null) {
         newShipSlot.add(coordinatesToKeys([slotX, slotY]));
     }
 
-    console.log("Actual Ship slots", newShipSlot);
-
     for (const ship of placedShips) {
-        if (ship.index === excludeIndex) continue;
-
         const [shipX, shipY] = ship.coordinates;
         const shipLength = ships.find((s) => s.index === ship.index).length;
 
-        console.log("Ship " + ship.index + " slots");
         for (let i = 0; i < shipLength; i++) {
             const occupiedX =
                 ship.orientation === "vertical" ? shipX + i : shipX;
             const occupiedY =
                 ship.orientation === "horizontal" ? shipY + i : shipY;
             const occupiedSlot = coordinatesToKeys([occupiedX, occupiedY]);
-            console.log(occupiedSlot);
 
             if (newShipSlot.has(occupiedSlot)) {
                 return true;
@@ -386,8 +444,25 @@ function handleDragEnd(e) {
 
     shipElement.classList.remove("dragging");
 
+    if (!checkIfShipIsPlaced()) {
+        if (draggedShipData.originalPosition) {
+            restoreOriginalPosition();
+        } else {
+            document.querySelector(".draggable-ships").appendChild(draggedShip);
+        }
+    }
+
     draggedShip = null;
     draggedShipData = null;
+}
+
+function checkIfShipIsPlaced() {
+    if (
+        placedShips.findIndex((ship) => ship.index === draggedShipData.index) >=
+        0
+    )
+        return true;
+    return false;
 }
 
 function finishPlacement() {
