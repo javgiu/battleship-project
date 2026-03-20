@@ -21,13 +21,6 @@ const occupiedPositions = new Set();
 const rotateButton = document.getElementById("rotate-ship");
 const placementBoard = document.querySelector(".placement-board");
 
-// const handlers = {
-//     rotate: rotateShip,
-//     click: (e) => handlePlaceShip(e, actualPlayer, ships),
-//     mouseover: (e) => handleShowPreview(e, ships),
-//     mouseout: (e) => removePreview(e),
-// };
-
 function removeEvents() {
     const draggableShips = document.querySelectorAll(".draggable-ships");
     const placementBoard = document.querySelector(".placement-board");
@@ -57,6 +50,8 @@ export function initShipPlacement(player, callback) {
     isPlacementActive = true;
     onComplete = callback;
     actualPlayer = player;
+
+    placedShips = [];
 
     renderShipsList();
     renderPlacementBoard(player);
@@ -168,8 +163,6 @@ function renderPlacementBoard(player) {
         )
         .join("");
     placementBoardDiv.innerHTML = placementBoardContent;
-    // Similar to renderPlayerBoard
-    // show hover preview
 }
 
 function attachDragEvents() {
@@ -250,7 +243,7 @@ function handleRotateClick(e) {
         } else {
             shipData.orientation = newOrientation;
             placedShips.push(shipData);
-            console.assert("Rotated");
+            console.log("Rotated");
         }
     }
 
@@ -320,7 +313,7 @@ function handleDrop(e) {
 
     if (!draggedShip || !draggedShipData) return;
 
-    const targetSlot = e.target.classList.contains(".placement-slot")
+    const targetSlot = e.target.classList.contains("placement-slot")
         ? e.target
         : e.target.closest(".placement-slot");
 
@@ -363,9 +356,7 @@ function handleDrop(e) {
         return;
     }
 
-    if (
-        isPositionOccupied(x, y, shipLength, orientation, draggedShipData.index)
-    ) {
+    if (isPositionOccupied(x, y, shipLength, orientation)) {
         console.warn("Position occupied by other ship");
         restoreOriginalPosition();
         return;
@@ -481,121 +472,3 @@ function resetState() {
     draggedShipData = null;
     placedShips = [];
 }
-
-// function allShipsPlaced() {
-//     const remainingShips = document.querySelectorAll(
-//         ".draggable-ships .draggable-ship",
-//     );
-
-//     if (remainingShips.length === 0) {
-//         return true;
-//     }
-
-//     return false;
-// }
-
-// function showPreview(e, ships) {
-//     const [x, y] = convertStringToNumbersArray(e.target.dataset.coordinates);
-
-//     const orientation = currentOrientation;
-//     const shipLength = ships[currentIndex].length;
-//     const slots = [];
-//     for (let i = 0; i < shipLength; i++) {
-//         const slotCoordinates =
-//             orientation === "horizontal" ? [x, y + i] : [x + i, y];
-//         slots.push(slotCoordinates);
-//     }
-//     const allSlotsValid = () => {
-//         return slots.every(([x, y]) => x < 8 && y < 8);
-//     };
-//     const existingSlots = slots
-//         .map((coordinates) => {
-//             const stringFromCoordinates = coordinatesToKeys(coordinates);
-//             const slot = document.querySelector(
-//                 `.placement-slot[data-coordinates="${stringFromCoordinates}"]`,
-//             );
-//             if (slot) {
-//                 return slot;
-//             } else return;
-//         })
-//         .filter(Boolean);
-//     const existingSlotsWithShip = () => {
-//         return existingSlots.find((slot) => slot.classList.contains("ship"));
-//     };
-
-//     if (existingSlotsWithShip() || !allSlotsValid())
-//         existingSlots.forEach((slot) => slot.classList.add("invalid"));
-//     else existingSlots.forEach((slot) => slot.classList.add("valid"));
-// }
-
-// function placeShip(e, player, ships) {
-//     const orientation = currentOrientation;
-//     const coordinates = convertStringToNumbersArray(
-//         e.target.dataset.coordinates,
-//     );
-
-//     try {
-//         player.placeShip(ships[currentIndex].index, {
-//             coordinates,
-//             orientation,
-//         });
-//         showShipPlaced();
-//         currentIndex++;
-
-//         if (currentIndex >= ships.length) {
-//             finishPlacement();
-//         } else {
-//             renderPlacementUI(ships[currentIndex], currentOrientation);
-//         }
-//     } catch (error) {
-//         console.error(error);
-//     }
-// }
-
-// function removePreview(e) {
-//     if (e.target.classList.contains("placement-slot")) {
-//         const slotsPreviewed = [
-//             ...document.querySelectorAll(".placement-slot.valid"),
-//             ...document.querySelectorAll(".placement-slot.invalid"),
-//         ];
-//         slotsPreviewed.forEach((slot) => {
-//             slot.classList.contains("valid")
-//                 ? slot.classList.remove("valid")
-//                 : slot.classList.remove("invalid");
-//         });
-//     }
-// }
-
-// function handleShowPreview(e, ships) {
-//     if (e.target.classList.contains("placement-slot")) showPreview(e, ships);
-// }
-
-// function handlePlaceShip(e, player, ships) {
-//     if (e.target.classList.contains("placement-slot")) {
-//         placeShip(e, player, ships);
-//     } else return;
-// }
-
-// function showShipPlaced() {
-//     const slots = [...placementBoard.children].filter((slot) =>
-//         slot.classList.contains("valid"),
-//     );
-//     slots.forEach((slot) => slot.classList.add("ship"));
-// }
-
-// Change this function
-// function rotateShip() {
-//     const visualShip = document.querySelector(".visual-ship");
-//     visualShip.classList.remove(currentOrientation);
-//     currentOrientation =
-//         currentOrientation === "horizontal" ? "vertical" : "horizontal";
-//     visualShip.classList.add(currentOrientation);
-// }
-
-// function attachEvents() {
-//     rotateButton.addEventListener("click", handlers.rotate);
-//     0;
-//     placementBoard.addEventListener("click", handlers.click);
-//     placementBoard.addEventListener("mouseover", handlers.mouseover);
-//     placementBoard.addEventListener("mouseout", handlers.mouseout);
-// }
