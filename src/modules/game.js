@@ -36,48 +36,50 @@ export function populatePlayers(playersInfo) {
     }
 }
 
-function start1PlayerGame() {
+async function start1PlayerGame() {
     showSection("ship-placement");
-    initShipPlacement(player1, () => {
-        showSection("game");
-        player2.placeShipsRandomly();
-        renderBoards(players);
-        setComputerBoardEvents();
-        initPlayerTurn(1);
-    });
+    await initShipPlacement(player1);
+
+    showSection("game");
+    player2.placeShipsRandomly();
+    renderBoards(players);
+    setComputerBoardEvents();
+    initPlayerTurn(1);
 }
 
-function start2PlayerGame() {
+async function start2PlayerGame() {
     showSection("ship-placement");
-    initShipPlacement(player1, () => {
-        showPassDeviceScreen(player2.name, () => {
-            showSection("ship-placement");
-            initShipPlacement(player2, () => {
-                showPassDeviceScreen(player1.name, () => {
-                    showSection("game");
-                    render2PlayerBoards(player1, player2);
-                    set2PlayerBoardEvents();
-                    initPlayerTurn(1);
-                });
-            });
-        });
-    });
+    await initShipPlacement(player1);
+
+    await showPassDeviceScreen(player2.name);
+
+    showSection("ship-placement");
+    await initShipPlacement(player2);
+
+    await showPassDeviceScreen(player1.name);
+
+    showSection("game");
+    render2PlayerBoards(player1, player2);
+    set2PlayerBoardEvents();
+    initPlayerTurn(1);
 }
 
-function showPassDeviceScreen(nextPlayerName, onReady) {
-    showSection("pass-device");
+function showPassDeviceScreen(nextPlayerName) {
+    return new Promise((resolve) => {
+        showSection("pass-device");
 
-    const message = document.querySelector(".pass-device-message");
-    message.textContent = `Pass device to ${nextPlayerName}`;
+        const message = document.querySelector(".pass-device-message");
+        message.textContent = `Pass device to ${nextPlayerName}`;
 
-    const readyButton = document.getElementById("ready-button");
+        const readyButton = document.getElementById("ready-button");
 
-    const handleReady = () => {
-        readyButton.removeEventListener("click", handleReady);
-        onReady();
-    };
+        const handleReady = () => {
+            readyButton.removeEventListener("click", handleReady);
+            resolve();
+        };
 
-    readyButton.addEventListener("click", handleReady);
+        readyButton.addEventListener("click", handleReady);
+    });
 }
 
 function render2PlayerBoards(currentPlayer, opponent) {
@@ -143,8 +145,6 @@ function renderBoardWithoutShips(player, boardDiv) {
         })
         .join("");
 
-    console.log(boardDiv);
-
     boardDiv.innerHTML = boardContent;
 }
 
@@ -164,7 +164,7 @@ function set2PlayerBoardEvents() {
     gameDiv.addEventListener("click", handle2PlayerAttack);
 }
 
-function handle2PlayerAttack(e) {
+async function handle2PlayerAttack(e) {
     const isSlot = e.target.classList.contains("slot");
     const enemyBoard = e.target.closest('[data-type="enemy"]');
     if (!isSlot || !enemyBoard) return;
@@ -201,13 +201,12 @@ function handle2PlayerAttack(e) {
                 player.isTurnToAttack(),
             );
 
-            showPassDeviceScreen(nextPlayer.name, () => {
-                const nextOpponent = players.find(
-                    (player) => !player.isTurnToAttack(),
-                );
-                showSection("game");
-                render2PlayerBoards(nextPlayer, nextOpponent);
-            });
+            await showPassDeviceScreen(nextPlayer.name);
+            const nextOpponent = players.find(
+                (player) => !player.isTurnToAttack(),
+            );
+            showSection("game");
+            render2PlayerBoards(nextPlayer, nextOpponent);
         }
     } catch (error) {
         console.warn(error.message);

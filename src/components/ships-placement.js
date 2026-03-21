@@ -42,20 +42,22 @@ function removeEvents() {
 }
 
 export function initShipPlacement(player, callback) {
-    if (isPlacementActive) {
-        console.warn("Ship placement in progress");
-        return;
-    }
+    return new Promise((resolve) => {
+        if (isPlacementActive) {
+            console.warn("Ship placement in progress");
+            return;
+        }
 
-    isPlacementActive = true;
-    onComplete = callback;
-    actualPlayer = player;
+        isPlacementActive = true;
+        onComplete = resolve;
+        actualPlayer = player;
 
-    placedShips = [];
+        placedShips = [];
 
-    renderShipsList();
-    renderPlacementBoard(player);
-    attachDragEvents();
+        renderShipsList();
+        renderPlacementBoard(player);
+        attachDragEvents();
+    });
 }
 
 function renderShipsList() {
