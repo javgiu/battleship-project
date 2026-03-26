@@ -14,8 +14,8 @@ function renderStartMenu() {
     menu.innerHTML = `
         <h2 class="subtitle"> Select game mode</h2>
         <div class="mode-buttons">
-            <button class="game-mode-button" data-mode="1-player">Player V.S Computer</button>
-            <button class="game-mode-button" data-mode="2-player">Player V.S Player</button>
+            <button class="game-mode-button" data-mode="1-player">1 Player</button>
+            <button class="game-mode-button" data-mode="2-player">2 Players</button>
         </div>
     `;
     startMenuSection.appendChild(menu);

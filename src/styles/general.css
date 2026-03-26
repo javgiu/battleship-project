@@ -1,5 +1,16 @@
+@font-face {
+    font-family: "sansation";
+    src:
+        url("./fonts/sansation/sansation-regular-webfont.woff") format("woff"),
+        url("./fonts/sansation/sansation-regular-webfont.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
-    background: linear-gradient(rgb(0, 0, 27), rgb(1, 1, 68)) no-repeat;
+    font-family: "sansation", sans-serif;
+
+    background: linear-gradient(rgb(0, 0, 0), rgb(17, 17, 17)) no-repeat;
     color: white;
     display: flex;
     flex-direction: column;

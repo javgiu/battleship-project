@@ -69,19 +69,27 @@ export function createPlayer(playerType = "computer", playerName = "Player") {
 
     if (type === "computer") {
         const attacks = new Set();
+
+        const aiState = {
+            mode: "hunt", // hunt or target
+            lastHit: null,
+            targetQueue: [],
+            currentTarget: null,
+            orientation: null,
+        };
         return {
             ...base,
             attack: () => {
-                let coordinates;
-                do {
-                    coordinates = getRandomCoordinates(gameboard.board.length);
-                } while (attacks.has(coordinatesToKeys(coordinates)));
-                attacks.add(coordinatesToKeys(coordinates));
-
-                return coordinates;
+                return intelligentAttack();
             },
 
-            /////////////// Working heeeereeeee /////////
+            reportHit: (coordinates, sunk) => {
+                handleHit(coordinates, sunk);
+            },
+
+            reportMiss: (coordinates) => {
+                handleMiss(coordinates);
+            },
 
             placeShipsRandomly: () => {
                 function isPositionValid(x, y, shipLength, orientation) {
@@ -135,6 +143,18 @@ export function createPlayer(playerType = "computer", playerName = "Player") {
                 });
             },
         };
+
+        function intelligentAttack() {
+            let coordinates;
+
+            if (aiState.mode === "target" && aiState.targetQueue.length > 0) {
+                coordinates = aiState.targetQueue.shift();
+            }
+        }
+
+        function handleHit(coordinates, sunk) {}
+
+        function handleMiss(coordinates) {}
     }
 
     return base;

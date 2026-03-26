@@ -256,7 +256,11 @@ function handleComputerAttacks() {
                 }
 
                 if (result === null) {
+                    player2.reportMiss(slotCoordinates);
                     changePlayersTurns();
+                } else {
+                    const sunk = result.isSunk();
+                    player2.reportHit(slotCoordinates, sunk);
                 }
 
                 if (player2.isTurnToAttack()) {

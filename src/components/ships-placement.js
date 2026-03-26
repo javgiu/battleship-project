@@ -45,13 +45,13 @@ export function initShipPlacement(player, callback) {
     return new Promise((resolve) => {
         if (isPlacementActive) {
             console.warn("Ship placement in progress");
+            resolve();
             return;
         }
 
         isPlacementActive = true;
         onComplete = resolve;
         actualPlayer = player;
-
         placedShips = [];
 
         renderShipsList();

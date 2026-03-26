@@ -18,12 +18,14 @@
 .game-mode-button {
     width: 250px;
     font-size: 1.25rem;
-    padding: 1rem;
+    padding: 0.25rem;
     background-color: transparent;
     border: none;
     color: white;
     font-weight: 700;
     transition: all 0.3s ease-in-out;
+    border: 2px solid white;
+    border-radius: 10px;
 }
 
 .game-mode-button:hover {
@@ -31,7 +33,6 @@
 }
 
 .player-name-form {
-    border: 1px solid white;
     width: 300px;
     display: flex;
     flex-direction: column;
@@ -46,15 +47,16 @@
     margin-top: 1rem;
     padding: 0.25rem 0.5rem;
     border-radius: 10px;
+    border: 2px solid white;
+    background-color: transparent;
+    color: white;
     font-size: 1.25rem;
+    transition: all 0.3s ease-in-out;
 }
 
 .player-name-form input:focus {
     outline: none;
-}
-
-.player-name-form input.invalid {
-    outline: 1px solid red;
+    box-shadow: 0 0 4px 3px rgb(77, 77, 77);
 }
 
 .form-buttons {
@@ -68,24 +70,35 @@
     flex: 1;
     padding: 0.35rem 1rem;
     border-radius: 10px;
-    border: none;
+    border: 3px solid;
     font-size: 1.25rem;
     color: white;
     font-weight: 700;
+    background-color: transparent;
+    transition: all 0.3s ease-in-out;
 }
 
 .form-buttons .accept {
-    background-color: rgb(1, 189, 1);
+    border-color: rgb(1, 189, 1);
+    color: rgb(1, 189, 1);
 }
 
 .form-buttons .cancel {
-    background-color: rgb(214, 1, 1);
+    border-color: rgb(214, 1, 1);
+    color: rgb(214, 1, 1);
 }
 
 .form-buttons .accept:hover {
-    background-color: rgb(1, 139, 1);
+    border-color: rgb(1, 139, 1);
+    color: rgb(1, 139, 1);
+    box-shadow: 0 2px 2px rgb(56, 56, 56);
+    transform: translateY(-2px);
 }
 
 .form-buttons .cancel:hover {
-    background-color: rgb(180, 1, 1);
+    border-color: rgb(180, 1, 1);
+    color: rgb(180, 1, 1);
+    box-shadow: 0 2px 2px rgb(56, 56, 56);
+
+    transform: translateY(-2px);
 }
