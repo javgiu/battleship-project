@@ -73,7 +73,8 @@
 .placement-board-container {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    align-items: center;
+    gap: 2rem;
 }
 
 .placement-board {
@@ -90,7 +91,7 @@
 }
 
 .placement-slot {
-    background-color: white;
+    background-color: #cfcfcf;
     width: 50px;
     height: 50px;
     transition: all 0.1s ease-in-out;
@@ -109,12 +110,72 @@
     background-color: gray;
 }
 
-.placement-board-container button {
-    background-color: green;
-    border-radius: 7px;
+#finish-placement-btn {
+    cursor: pointer;
     color: white;
+    font-size: 1.75rem;
+    width: 300px;
+
+    padding: 0.35em 1em;
+    border: 0.175em solid white;
+    font-weight: 900;
+    background-color: transparent;
+
+    text-shadow:
+        0 0 0.125em hsla(0, 0%, 100%, 0.39),
+        0 0 0.45em white;
+    box-shadow:
+        inset 0 0 0.5em white,
+        0 0 0.5em white;
+
+    position: relative;
 }
 
+#finish-placement-btn::before {
+    pointer-events: none;
+    content: "";
+    background-color: white;
+    position: absolute;
+    top: 130%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: perspective(2em) rotateX(40deg) scale(1, 0.35);
+    filter: blur(2em);
+    opacity: 0.5;
+    transition: opacity 100ms linear;
+}
+
+#finish-placement-btn::after {
+    content: "";
+    background-color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: white;
+    z-index: -1;
+    box-shadow: 0 0 2em 0.25em white;
+    opacity: 0;
+    transition: opacity 100ms linear;
+}
+
+#finish-placement-btn:hover,
+#finish-placement-btn:focus {
+    text-shadow: none;
+    color: black;
+}
+
+#finish-placement-btn:hover::after,
+#finish-placement-btn:focus::after {
+    opacity: 1;
+}
+
+#finish-placement-btn:hover::before,
+#finish-placement-btn:focus::before {
+    opacity: 1;
+}
 @media (max-width: 800px) {
     .placement-container {
         flex-direction: column;

@@ -89,15 +89,11 @@
 }
 
 .form-buttons .accept:hover {
-    border-color: rgb(1, 139, 1);
-    color: rgb(1, 139, 1);
     box-shadow: 0 2px 2px rgb(56, 56, 56);
     transform: translateY(-2px);
 }
 
 .form-buttons .cancel:hover {
-    border-color: rgb(180, 1, 1);
-    color: rgb(180, 1, 1);
     box-shadow: 0 2px 2px rgb(56, 56, 56);
 
     transform: translateY(-2px);
