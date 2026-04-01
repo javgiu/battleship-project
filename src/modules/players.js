@@ -74,7 +74,8 @@ export function createPlayer(playerType = "computer", playerName = "Player") {
             mode: "hunt", // hunt or target
             lastHit: null,
             targetQueue: [],
-            currentTarget: null,
+            // currentTarget: null,
+            hits: [],
             orientation: null,
         };
         return {
@@ -149,12 +150,130 @@ export function createPlayer(playerType = "computer", playerName = "Player") {
 
             if (aiState.mode === "target" && aiState.targetQueue.length > 0) {
                 coordinates = aiState.targetQueue.shift();
+
+                while (
+                    attacks.has(coordinatesToKeys(coordinates)) &&
+                    aiState.targetQueue.length > 0
+                ) {
+                    coordinates = aiState.targetQueue.shift();
+                }
+
+                if (attacks.has(coordinatesToKeys(coordinates))) {
+                    aiState.mode = "hunt";
+                    return getRandomAttack();
+                }
+            } else {
+                coordinates = getRandomAttack();
+            }
+
+            attacks.add(coordinatesToKeys(coordinates));
+            return coordinates;
+        }
+
+        function handleHit(coordinates, sunk) {
+            if (sunk) {
+                aiState.mode = "hunt";
+                aiState.lastHit = null;
+                aiState.targetQueue = [];
+                aiState.hits = [];
+                aiState.orientation = null;
+            } else {
+                aiState.mode = "target";
+                aiState.lastHit = coordinates;
+                aiState.hits.push(coordinates);
+
+                // Determine orientation
+                if (aiState.hits >= 2) determineOrientation();
+
+                addAdjacentToQueue(coordinates);
             }
         }
 
-        function handleHit(coordinates, sunk) {}
+        function handleMiss(coordinates) {
+            console.log("AI missed");
+        }
 
-        function handleMiss(coordinates) {}
+        function determineOrientation() {
+            if (aiState.hits.length < 2) return;
+
+            const [x1, y1] = aiState.hits[0];
+            const [x2, y2] = aiState.hits[1];
+
+            if (x1 === x2) {
+                aiState.orientation = "horizontal";
+            } else if (y1 === y2) {
+                aiState.orientation = "vertical";
+            }
+        }
+
+        function addAdjacentToQueue(coordinates) {
+            const [x, y] = coordinates;
+
+            if (aiState.orientation === null) {
+                const adjacent = [
+                    [x - 1, y], // down
+                    [x + 1, y], // up
+                    [x, y + 1], // right
+                    [x, y - 1], // left
+                ];
+
+                adjacent.forEach((coord) => {
+                    if (
+                        isValidCoordinate(coord) &&
+                        !attacks.has(coordinatesToKeys(coord))
+                    ) {
+                        aiState.targetQueue.push(coord);
+                    }
+                });
+            } else if (aiState.orientation === "vertical") {
+                const targets = [
+                    [x + 1, y],
+                    [x - 1, y],
+                ];
+
+                targets.forEach((coord) => {
+                    if (
+                        isValidCoordinate(coord) &&
+                        !attacks.has(coordinatesToKeys(coord))
+                    ) {
+                        aiState.targetQueue.push(coord);
+                    }
+                });
+            } else if (aiState.orientation === "horizontal") {
+                const targets = [
+                    [x, y + 1],
+                    [x, y - 1],
+                ];
+
+                targets.forEach((coord) => {
+                    if (
+                        isValidCoordinate(coord) &&
+                        !attacks.has(coordinatesToKeys(coord))
+                    ) {
+                        aiState.targetQueue.push(coord);
+                    }
+                });
+            }
+        }
+
+        function isValidCoordinate([x, y]) {
+            return (
+                x >= 0 &&
+                x < gameboard.board.length &&
+                y >= 0 &&
+                y < gameboard.board.length
+            );
+        }
+
+        function getRandomAttack() {
+            let coordinates;
+
+            do {
+                coordinates = getRandomCoordinates(gameboard.board.length);
+            } while (attacks.has(coordinatesToKeys(coordinates)));
+
+            return coordinates;
+        }
     }
 
     return base;

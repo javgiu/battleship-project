@@ -243,6 +243,7 @@ function showSection(sectionId) {
 function handleComputerAttacks() {
     function makeAttack() {
         const slotCoordinates = coordinatesToKeys(player2.attack());
+
         if (player2.isTurnToAttack()) {
             try {
                 const result = player1.receiveAttack(
@@ -256,11 +257,16 @@ function handleComputerAttacks() {
                 }
 
                 if (result === null) {
-                    player2.reportMiss(slotCoordinates);
+                    player2.reportMiss(
+                        convertStringToNumbersArray(slotCoordinates),
+                    );
                     changePlayersTurns();
                 } else {
                     const sunk = result.isSunk();
-                    player2.reportHit(slotCoordinates, sunk);
+                    player2.reportHit(
+                        convertStringToNumbersArray(slotCoordinates),
+                        sunk,
+                    );
                 }
 
                 if (player2.isTurnToAttack()) {
